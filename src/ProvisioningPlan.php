@@ -58,7 +58,7 @@ class ProvisioningPlan
         $connectionQueues = \App\Models\Connection\Connection::all()->pluck('queue_name')->toArray();
         $newQueue = array_merge($queue, $connectionQueues);
         $analyticsQueues = \App\Models\Emailing\EmailingAnalytics::all()->map(function ($analytic) {
-            return 'analytics_' . $analytic->id;
+            return 'analytics_' . $analytic->id . '_' . $analytic->emailing->name;
         })->toArray();
         $newQueue = array_merge($newQueue, $analyticsQueues);
         Config::set('horizon.environments.' . (config('horizon.env') ?? config('app.env')) . '.supervisor-1.queue', $newQueue);
