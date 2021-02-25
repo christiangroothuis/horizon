@@ -2,6 +2,7 @@
 
 namespace Laravel\Horizon;
 
+use App\Models\Emailing\EmailingAnalytics;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Horizon\Contracts\HorizonCommandQueue;
@@ -55,8 +56,12 @@ class ProvisioningPlan
     public static function get($master)
     {
         $queue = config('horizon.environments.' . (config('horizon.env') ?? config('app.env')) . '.supervisor-1.queue');
-        $extra = \App\Models\Connection\Connection::all()->pluck('queue_name')->toArray();
-        $newQueue = array_merge($queue, $extra);
+        $connectionQueues = \App\Models\Connection\Connection::all()->pluck('queue_name')->toArray();
+        $newQueue = array_merge($queue, $connectionQueues);
+        $analyticsQueues = EmailingAnalytics::all()->map(function ($analytic) {
+            return 'analytics_' . $analytic->id;
+        })->toArray();
+        $newQueue = array_merge($newQueue, $analyticsQueues);
         Config::set('horizon.environments.' . (config('horizon.env') ?? config('app.env')) . '.supervisor-1.queue', $newQueue);
 
         return new static($master, config('horizon.environments'));
