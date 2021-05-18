@@ -5,6 +5,7 @@ namespace Laravel\Horizon;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Config;
 use Laravel\Horizon\Contracts\HorizonCommandQueue;
 use Laravel\Horizon\Events\MasterSupervisorDeployed;
 use Laravel\Horizon\MasterSupervisorCommands\AddSupervisor;
@@ -55,7 +56,12 @@ class ProvisioningPlan
      * @return static
      */
     public static function get($master)
-    {
+    {        
+        $queue = config('horizon.environments.' . (config('horizon.env') ?? config('app.env')) . '.supervisor-1.queue');
+        $extra = \App\Models\Connection\Connection::all()->pluck('queue_name')->toArray();
+        $newQueue = array_merge($queue, $extra);
+        Config::set('horizon.environments.' . (config('horizon.env') ?? config('app.env')) . '.supervisor-1.queue', $newQueue);
+        
         return new static($master, config('horizon.environments'), config('horizon.defaults', []));
     }
 
