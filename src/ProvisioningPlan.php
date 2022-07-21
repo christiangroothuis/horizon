@@ -63,10 +63,10 @@ class ProvisioningPlan
         $analyticsQueues = \App\Models\Emailing\EmailingAnalytics::all()->map(function ($analytic) {
             return 'analytics_' . $analytic->id . '_' . $analytic->emailing->name;
         })->toArray();
-        $analyticsGa4Queues = \App\Models\Emailing\EmailingAnalyticsGA4::all()->map(function ($analytic) {
+        $analyticsGA4Queues = \App\Models\Emailing\EmailingAnalyticsGA4::all()->map(function ($analytic) {
             return 'analytics_ga4_' . $analytic->id . '_' . $analytic->emailing->name;
         })->toArray();
-        $newQueue = array_merge($newQueue, $analyticsQueues, $analyticsGa4Queues);
+        $newQueue = array_merge($newQueue, $analyticsQueues, $analyticsGA4Queues);
         Config::set('horizon.environments.' . (config('horizon.env') ?? config('app.env')) . '.supervisor-1.queue', $newQueue);
 
         return new static($master, config('horizon.environments'), config('horizon.defaults', []));
